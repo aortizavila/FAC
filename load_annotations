@@ -1,0 +1,27 @@
+
+
+def load_annotations(self):
+        annotations = []
+        annotation_files = os.listdir(self.annotation_dir)
+        for annotation_file in annotation_files:
+            image_id = os.path.splitext(annotation_file)[0]
+            image_path = self.data_path + image_id + '.jpg'
+            try:
+                with open(os.path.join(self.annotation_dir, annotation_file), 'r') as file:
+                    lines = file.readlines()
+                    boxes = []
+                    labels = []
+                    for line in lines:
+                        data = line.strip().split(' ')
+                        label,x_min, y_min, x_max, y_max = map(float, data)
+                        boxes.append([x_min, y_min, x_max, y_max])
+                        labels.append(int(label))
+                    annotations.append({
+                        'image_path': image_path,
+                        'boxes': boxes,
+                        'labels': labels
+                    })
+            except:
+                pass
+        return annotations
+		
