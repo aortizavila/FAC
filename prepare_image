@@ -1,0 +1,33 @@
+def prepare_image(
+        image : np.ndarray,
+        inp_dim : Tuple[int, int]) -> torch.Tensor:
+    """
+    Preparar la imagen para que coincida con la red
+    """
+    print("1. PREPARANDO LA IMAGEN")
+    print("1.1 Ajustar la imagen con el tamñano de la red")
+    img = letterbox_image(image, inp_dim)
+    print("1.2 se hace un transpose del arreglo")
+    img = img[:, :, ::-1].transpose((2, 0, 1)).copy()
+    print("1.3 se asigna un arreglo a un sensor")
+    img = torch.from_numpy(img).float().div(255.0).unsqueeze(0
+    return img
+
+def letterbox_image(
+        image : np.ndarray,
+        inp_dim : Tuple[int, int]) -> np.ndarray:
+    """
+    Cambia el tamaño de las imágenes a la dimensión esperada por la red.
+    """
+    print("1.1 Proceso que cambia el tamaño (dimensión de la imagen por la esperada por la red.")
+    img_w, img_h = image.shape[1], image.shape[0] # original image dimension
+    net_w, net_h = inp_dim # the dimension expected by the network.
+    
+    scale_factor = min(net_w/img_w, net_h/img_h)
+    new_w = int(round(img_w * scale_factor))
+    new_h = int(round(img_h * scale_factor))
+
+    resized_image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_CUBIC)
+    canvas = np.full((net_w, net_h, 3), 128)
+    canvas[(net_h - new_h)//2 : (net_h - new_h)//2 + new_h, (net_w - new_w)//2 : (net_w - new_w)//2 + new_w, :] = resized_image
+    return canvas
